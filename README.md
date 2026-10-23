@@ -1,11 +1,40 @@
 # BRD → ADF Medallion Agent
 
-A production web app that turns a data engineer's **Business Requirements Document**
-into a deployed **Azure Data Factory** medallion pipeline (Bronze → Silver → Gold),
-shows the generated pipelines for review, and on approval **builds and runs them for
-real** in your Azure subscription — with live Bronze→Silver→Gold run status streamed
-back. ADF only (no Databricks/Synapse/Fabric). Nothing touches your tenant before
-approval.
+An LLM agent prototype that turns a data engineer's **Business Requirements Document**
+into a deployed **Azure Data Factory** medallion pipeline (Bronze → Silver → Gold).
+It shows the generated pipelines for review and, on approval, **builds and runs them for
+real** in your Azure subscription, streaming live Bronze→Silver→Gold run status back.
+It targets ADF only (no Databricks, Synapse or Fabric), and nothing touches your tenant
+before approval.
+
+![Generated plan with approval gate](docs/images/plan.png)
+
+### Design in 30 seconds
+
+- **The LLM never writes ADF JSON.** It fills a small, validated plan (sources, casts,
+  filters, aggregations). Deterministic code compiles that plan into ADF JSON and Data
+  Flow script, so the output is always well-formed.
+- **Pre-flight gate.** Offline checks (schema, naming, cross-references, script lint,
+  column and type checks) must pass before the Approve button unlocks.
+- **Human in the loop.** You review every linked service, dataset, data flow and
+  pipeline before anything is deployed.
+- **Self-healing runs.** A failed deploy or run sends the error back to the model once
+  for a targeted fix, then retries. Every attempt is kept in an audit trail.
+- **Offline-first.** `MOCK=true` simulates the whole deploy and run locally. The repo
+  has 180 unit tests plus a smoke test, all running without Azure or an LLM.
+
+![Mock run: Bronze, Silver and Gold succeeded](docs/images/run.png)
+
+### Limitations & next steps
+
+This is a working prototype, not a hosted product:
+
+- Run state is held in memory. **Next:** persist runs in SQLite or Postgres.
+- Auth is a single shared `API_TOKEN`. **Next:** per-user auth and roles.
+- Sources are HTTP, Blob/ADLS, REST and SQL, mostly file-based CSV. **Next:** more
+  connectors and incremental loads.
+- Extraction accuracy across many BRDs isn't reported yet. `tests/eval_spec_gen.py`
+  measures it against the golden and held-out BRD sets in `tests/`, but it needs an LLM key.
 
 ```
 BRD in  →  agent GENERATES pipelines  →  SHOW user (JSON + Data Flow scripts + visual

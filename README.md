@@ -190,8 +190,8 @@ Factory and ADLS Gen2 account, plus a Claude deployment on Azure AI Foundry. Non
 that is needed for the local dry run (`MOCK=true`).
 
 ```powershell
-git clone https://github.com/karnasanjana/az_agent.git
-cd az_agent
+git clone https://github.com/karnasanjana/brd-to-adf-agent.git
+cd brd-to-adf-agent
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1          # bash/zsh: source .venv/bin/activate
 pip install -r requirements.txt

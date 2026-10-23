@@ -1,0 +1,26 @@
+# Typed spec contract
+pydantic>=2.7
+typing-extensions>=4.10
+
+# The ONLY framework — used solely to get a validated PipelineSpec from Claude
+pydantic-ai>=0.0.30
+
+# Claude via Azure AI Foundry (Anthropic-compatible endpoint)
+anthropic>=0.40
+
+# Optional — only needed if you switch LLM_PROVIDER away from anthropic.
+# LLM_PROVIDER=openai  -> pip install "openai>=1.30"
+# LLM_PROVIDER=gemini  -> pip install "google-genai>=1.0"
+# (pydantic-ai drives them; the project stays provider-agnostic via config.get_model)
+google-genai>=1.0
+
+# API + UI
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9          # BRD file upload (multipart/form-data)
+pypdf>=4.0                        # extract BRD text from uploaded PDFs
+
+# Azure deploy — Managed Identity / service principal only, no account keys
+azure-identity>=1.16
+azure-mgmt-datafactory>=9.0
+azure-storage-file-datalake>=12.14

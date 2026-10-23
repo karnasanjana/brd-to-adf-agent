@@ -1,0 +1,25 @@
+# Phase 4 hold-the-line: the OFFLINE half of the eval on every push/PR.
+# No LLM key in CI — the full test suite stubs every model call, so this
+# catches compiler/typecheck/preflight regressions for free. The LLM half
+# (tests/eval_spec_gen.py --logical) stays manual: run it before merging any
+# extractor-prompt / LogicalPlan / compiler change and hold the >=95% gate.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  offline-tests:
+    runs-on: ubuntu-latest
+    env:
+      MOCK: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt pytest
+      - run: python -m pytest tests/ -q
